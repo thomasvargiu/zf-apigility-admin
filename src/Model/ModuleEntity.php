@@ -60,8 +60,8 @@ class ModuleEntity
         array $rpcServices = [],
         $isVendor = null
     ) {
-        if (false !== ($pos = \strrpos($namespace, 'Module', -6)) && \class_exists($namespace)) {
-            $namespace = rtrim(\substr($namespace, $pos), '\\');
+        if ('Module' === \substr($namespace, -6) && \class_exists($namespace)) {
+            $namespace = rtrim(\substr($namespace, 0, -6), '\\');
         }
         if (! class_exists($namespace) && ! class_exists($namespace . '\\Module')) {
             throw new InvalidArgumentException(sprintf(
