@@ -226,7 +226,9 @@ class ModuleEntity
      */
     protected function determineVendorStatus()
     {
-        $r = new ReflectionClass($this->namespace . '\\Module');
+        $className = \class_exists($this->namespace) ? $this->namespace : $this->namespace . '\\Module';
+
+        $r = new ReflectionClass($className);
         $filename = $r->getFileName();
         if (preg_match('#[/\\\\]vendor[/\\\\]#', $filename)) {
             $this->isVendor = true;
