@@ -63,7 +63,7 @@ class ModuleEntity
         if ('Module' === \substr($namespace, -6) && \class_exists($namespace)) {
             $namespace = rtrim(\substr($namespace, 0, -6), '\\');
         }
-        if (! class_exists($namespace) && ! class_exists($namespace . '\\Module')) {
+        if (! class_exists($namespace . '\\Module')) {
             throw new InvalidArgumentException(sprintf(
                 'Invalid module "%s"; no Module class exists for that module',
                 $namespace
