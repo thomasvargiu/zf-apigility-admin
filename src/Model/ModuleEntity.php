@@ -60,7 +60,7 @@ class ModuleEntity
         array $rpcServices = [],
         $isVendor = null
     ) {
-        if (! class_exists($namespace . '\\Module')) {
+        if (! class_exists($namespace) && ! class_exists($namespace . '\\Module')) {
             throw new InvalidArgumentException(sprintf(
                 'Invalid module "%s"; no Module class exists for that module',
                 $namespace

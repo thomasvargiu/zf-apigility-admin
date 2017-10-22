@@ -19,4 +19,13 @@ class ModuleEntityTest extends TestCase
         $moduleEntity->exchangeArray(['default_version' => 123]);
         $this->assertSame(123, $moduleEntity->getDefaultVersion());
     }
+
+    public function testCanSetAndRetrieveModuleDefaultVersionWithModuleClass()
+    {
+        $moduleEntity = new ModuleEntity('Test\Foo\Module');
+        $this->assertSame(1, $moduleEntity->getDefaultVersion()); // initial state
+
+        $moduleEntity->exchangeArray(['default_version' => 123]);
+        $this->assertSame(123, $moduleEntity->getDefaultVersion());
+    }
 }
