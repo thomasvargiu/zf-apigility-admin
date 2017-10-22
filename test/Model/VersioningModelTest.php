@@ -73,15 +73,21 @@ class VersioningModelTest extends TestCase
         return rmdir($dir);
     }
 
-    public function testGetModuleVersions()
+    /**
+     * @dataProvider versionModuleNameProvider
+     */
+    public function testGetModuleVersions($moduleName)
     {
-        $versions = $this->model->getModuleVersions('Version', __DIR__ . '/TestAsset/module/Version/src/Version');
+        $versions = $this->model->getModuleVersions($moduleName, __DIR__ . '/TestAsset/module/Version/src/Version');
         $this->assertEquals([1], $versions);
     }
 
-    public function testCreateVersion()
+    /**
+     * @dataProvider versionModuleNameProvider
+     */
+    public function testCreateVersion($moduleName)
     {
-        $result = $this->model->createVersion('Version', 2, __DIR__ . '/TestAsset/module/Version/src/Version');
+        $result = $this->model->createVersion($moduleName, 2, __DIR__ . '/TestAsset/module/Version/src/Version');
 
         $this->assertTrue($result);
         $this->assertTrue(file_exists(__DIR__ . "/TestAsset/module/Version/src/Version/V2"));
@@ -184,9 +190,12 @@ class VersioningModelTest extends TestCase
         $this->removeDir(__DIR__ . "/TestAsset/module/Version/src/Version/V2");
     }
 
-    public function testCreateVersionRenamesNamespacesInCopiedClasses()
+    /**
+     * @dataProvider versionModuleNameProvider
+     */
+    public function testCreateVersionRenamesNamespacesInCopiedClasses($moduleName)
     {
-        $result = $this->model->createVersion('Version', 2, __DIR__ . '/TestAsset/module/Version/src/Version');
+        $result = $this->model->createVersion($moduleName, 2, __DIR__ . '/TestAsset/module/Version/src/Version');
         $this->assertTrue(file_exists(__DIR__ . "/TestAsset/module/Version/src/Version/V2/Rpc/Bar/BarController.php"));
         $this->assertTrue(file_exists(__DIR__ . "/TestAsset/module/Version/src/Version/V2/Rest/Foo/FooEntity.php"));
 
@@ -209,7 +218,10 @@ class VersioningModelTest extends TestCase
         $this->assertRegExp($pattern2, $entity);
     }
 
-    public function testCreateNewVersionClonesAuthorizationConfigurationForNewVersion()
+    /**
+     * @dataProvider versionModuleNameProvider
+     */
+    public function testCreateNewVersionClonesAuthorizationConfigurationForNewVersion($moduleName)
     {
         $originalConfig = include __DIR__ . '/TestAsset/module/Version/config/module.config.php';
         $this->assertArrayHasKey('zf-mvc-auth', $originalConfig);
@@ -217,7 +229,7 @@ class VersioningModelTest extends TestCase
         $this->assertEquals(4, count($originalConfig['zf-mvc-auth']['authorization']));
         $originalAuthorization = $originalConfig['zf-mvc-auth']['authorization'];
 
-        $result = $this->model->createVersion('Version', 2, __DIR__ . '/TestAsset/module/Version/src/Version');
+        $result = $this->model->createVersion($moduleName, 2, __DIR__ . '/TestAsset/module/Version/src/Version');
 
         $updatedConfig = include __DIR__ . '/TestAsset/module/Version/config/module.config.php';
         $this->assertArrayHasKey('zf-mvc-auth', $updatedConfig);
@@ -238,7 +250,10 @@ class VersioningModelTest extends TestCase
         }
     }
 
-    public function testCreateNewVersionClonesValidationConfigurationForNewVersion()
+    /**
+     * @dataProvider versionModuleNameProvider
+     */
+    public function testCreateNewVersionClonesValidationConfigurationForNewVersion($moduleName)
     {
         $originalConfig = include __DIR__ . '/TestAsset/module/Version/config/module.config.php';
         $this->assertArrayHasKey('zf-content-validation', $originalConfig);
@@ -250,7 +265,7 @@ class VersioningModelTest extends TestCase
         $this->assertArrayHasKey('input_filter_specs', $originalConfig);
         $this->assertArrayHasKey('Version\V1\Rest\Message\Validator', $originalConfig['input_filter_specs']);
 
-        $result = $this->model->createVersion('Version', 2, __DIR__ . '/TestAsset/module/Version/src/Version');
+        $result = $this->model->createVersion($moduleName, 2, __DIR__ . '/TestAsset/module/Version/src/Version');
 
         $updatedConfig = include __DIR__ . '/TestAsset/module/Version/config/module.config.php';
 
@@ -295,7 +310,10 @@ class VersioningModelTest extends TestCase
         $this->assertSame(1337, $newConfig['zf-versioning']['default_version']);
     }
 
-    public function testCreateNewVersionClonesDocumentationForNewVersion()
+    /**
+     * @dataProvider versionModuleNameProvider
+     */
+    public function testCreateNewVersionClonesDocumentationForNewVersion($moduleName)
     {
         $docsConfig = include $this->moduleDocsConfigFile;
         $this->assertArrayHasKey('Version\V1\Rest\Message\Controller', $docsConfig);
@@ -305,7 +323,7 @@ class VersioningModelTest extends TestCase
         $this->assertTrue(isset($docsConfig['Version\V1\Rest\Comment\Controller']['collection']['GET']['response']));
         $this->assertTrue(isset($docsConfig['Version\V1\Rest\Comment\Controller']['entity']['GET']['response']));
 
-        $result = $this->model->createVersion('Version', 2, __DIR__ . '/TestAsset/module/Version/src/Version');
+        $result = $this->model->createVersion($moduleName, 2, __DIR__ . '/TestAsset/module/Version/src/Version');
 
         $newDocsConfig = include $this->moduleDocsConfigFile;
         $this->assertArrayHasKey('Version\V2\Rest\Message\Controller', $newDocsConfig);
@@ -326,5 +344,12 @@ class VersioningModelTest extends TestCase
             $docsConfig['Version\V1\Rest\Comment\Controller'],
             $newDocsConfig['Version\V2\Rest\Comment\Controller']
         );
+    }
+
+    public function versionModuleNameProvider()
+    {
+        return [
+            ['Version', 'Version\Module'],
+        ];
     }
 }

@@ -161,7 +161,10 @@ class VersioningModel
         }
 
         // .. or fall back to the old method, which only supports PSR-0
-        $moduleClass = sprintf('%s\\Module', $module);
+        $moduleClass = $module;
+        if (! class_exists($module)) {
+            $moduleClass = sprintf('%s\\Module', $module);
+        }
 
         if (! class_exists($moduleClass)) {
             throw new Exception\InvalidArgumentException(sprintf(
