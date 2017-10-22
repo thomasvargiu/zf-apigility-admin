@@ -60,6 +60,9 @@ class ModuleEntity
         array $rpcServices = [],
         $isVendor = null
     ) {
+        if (false !== ($pos = \strrpos($namespace, 'Module', -6)) && \class_exists($namespace)) {
+            $namespace = rtrim(\substr($namespace, $pos), '\\');
+        }
         if (! class_exists($namespace) && ! class_exists($namespace . '\\Module')) {
             throw new InvalidArgumentException(sprintf(
                 'Invalid module "%s"; no Module class exists for that module',
@@ -226,9 +229,7 @@ class ModuleEntity
      */
     protected function determineVendorStatus()
     {
-        $className = \class_exists($this->namespace) ? $this->namespace : $this->namespace . '\\Module';
-
-        $r = new ReflectionClass($className);
+        $r = new ReflectionClass($this->namespace . '\\Module');
         $filename = $r->getFileName();
         if (preg_match('#[/\\\\]vendor[/\\\\]#', $filename)) {
             $this->isVendor = true;
