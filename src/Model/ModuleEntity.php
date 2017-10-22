@@ -60,6 +60,8 @@ class ModuleEntity
         array $rpcServices = [],
         $isVendor = null
     ) {
+        $name = $namespace;
+
         if ('Module' === \substr($namespace, -6) && \class_exists($namespace)) {
             $namespace = rtrim(\substr($namespace, 0, -6), '\\');
         }
@@ -70,7 +72,7 @@ class ModuleEntity
             ));
         }
 
-        $this->name         = $namespace;
+        $this->name         = $name;
         $this->namespace    = $namespace;
         $this->restServices = $restServices;
         $this->rpcServices  = $rpcServices;
